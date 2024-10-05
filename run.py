@@ -40,7 +40,7 @@ def index():
         elif row['full_name'] == 'Venus':
             color = 'orange'
         elif row['full_name'] == 'Earth':
-            color = 'green'
+            color = 'blue'
         elif row['full_name'] == 'Mars':
             color = 'red'
 
@@ -104,7 +104,9 @@ def index():
 
     # Update layout for better visibility
     fig.update_layout(
-        title='Near Earth Objects and Planets',
+        height=800,  # Set a specific height if needed
+        width=1400,  # Set a specific width if needed
+        title='3D Visualization of NEOs and Planets',
         scene=dict(
             xaxis=dict(showbackground=False),
             yaxis=dict(showbackground=False),
@@ -113,6 +115,7 @@ def index():
         ),
         showlegend=True
     )
+
 
     # Generate HTML div for the plot
     plot_div = pyo.plot(fig, include_plotlyjs=False, output_type='div')

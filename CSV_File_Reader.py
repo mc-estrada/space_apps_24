@@ -7,7 +7,7 @@ def read_csv(file_name):
             csv_reader = csv.reader(file)
             print(f"{new_name}")
             for row in csv_reader:
-                print(f" {row}\n")
+                print(f" {row}\n \n")
     except FileNotFoundError:
         print(f"Error: {file_name} not found.")
     except Exception as e:

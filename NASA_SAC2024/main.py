@@ -32,46 +32,6 @@ def plot_point(ax, points):
     x, y, z = zip(*points)
     ax.scatter(x, y, z, c='r', marker='o')
 
-"""
-def read_neo_pha_database(filename):
-    neo_pha_data = []
-
-    with open(filename, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            data = {
-                'full_name': row['full_name'].strip(),
-                'diameter': float(row['diameter']) if row['diameter'] else None,
-                'epoch': float(row['epoch']),
-                'e': float(row['e']),
-                'a': float(row['a']),
-                'q': float(row['q']),
-                'i': float(row['i']),
-            }
-            neo_pha_data.append(data)
-
-    return neo_pha_data
-
-def read_near_earth_comet_database(filename):
-    near_earth_comet_data = []
-
-    with open(filename, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            data = {
-                'full_name': row['full_name'].strip(),
-                'H': float(row['H']) if row['H'] else None,
-                'G': float(row['G']) if row['G'] else None,
-                'epoch': float(row['epoch']),
-                'e': float(row['e']),
-                'a': float(row['a']),
-                'q': float(row['q']),
-                'i': float(row['i']),
-            }
-            near_earth_comet_data.append(data)
-
-    return near_earth_comet_data
-"""
 
 def populate_plane(ax, planets, neos, comets):
     # planets, blue
@@ -105,17 +65,6 @@ def populate_plane(ax, planets, neos, comets):
     return
 
 
-
-"""
-def load_data():
-    # Load the data from the files
-    neo_pha_data = read_neo_pha_database('NEO PHA Database.csv')
-    near_earth_comet_data = read_near_earth_comet_database('Near Earth Comet Database.csv')
-    
-    return neo_pha_data, near_earth_comet_data
-"""
-
-
 def update_plane():
 
     return
@@ -137,6 +86,8 @@ def main():
     populate_plane(ax, planets, neos, comets)
     plt.show()
 
+    #calculate orbits and position changes
+    update_plane()
 
 
 if __name__ == "__main__":

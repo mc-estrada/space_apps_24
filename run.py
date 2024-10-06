@@ -14,6 +14,9 @@ def index():
     # Load planet data from the CSV file
     planet_data = pd.read_csv('planets.csv')
 
+    # Load comets (NECs) from the CSV file
+    comet_data = pd.read_csv('NEC.csv')
+
     # Constants
     AU_to_km = 149597870.7  # 1 AU in km
 
@@ -32,7 +35,7 @@ def index():
     for _, row in planet_data.iterrows():
         a = row['a (AU)']
         diameter = row['diameter (km)']
-        color = 'orange'  # Default color, can vary by planet
+        color = 'orange'  # Default color for planets
 
         # Set color based on planet name
         if row['full_name'] == 'Mercury':
@@ -102,11 +105,42 @@ def index():
                 name=row['full_name']
             ))
 
+    # Add NECs (Comets)
+    for index, row in comet_data.iterrows():
+        a = row['a'] * AU_to_km  # Semi-major axis in km
+        e = row['e']  # Eccentricity
+        i = row['i']  # Inclination in degrees
+        ma = row['ma']  # Mean anomaly
+        num_points = 100
+        true_anomalies = np.linspace(0, 360, num_points)
+
+        # True anomaly calculation (similar to NEO)
+        M = np.radians(ma)  # Mean anomaly in radians
+        E = M  # Start with E = M
+        for _ in range(10):  # Iterate to solve Kepler's equation
+            E = M + e * np.sin(E)
+
+        true_anomaly = 2 * np.arctan2(np.sqrt(1 + e) * np.sin(E / 2), np.sqrt(1 - e) * np.cos(E / 2))
+        r = a * (1 - e * np.cos(E))  # Radius at true anomaly
+
+        # Convert to Cartesian coordinates
+        x = r * np.cos(true_anomaly)
+        y = r * np.sin(true_anomaly)
+        z = x * np.sin(np.radians(i))  # Inclination for comets
+
+        # Plot NEC as a smaller point
+        fig.add_trace(go.Scatter3d(
+            x=[x], y=[y], z=[z],
+            mode='markers',
+            marker=dict(size=4, color='green'),  # Smaller size for comets
+            name=row['full_name'] + ' (Comet)'
+        ))
+
     # Update layout for better visibility
     fig.update_layout(
         height=800,  # Set a specific height if needed
         width=1400,  # Set a specific width if needed
-        title='3D Visualization of NEOs and Planets',
+        title='3D Visualization of NEOs, NECs, and Planets',
         scene=dict(
             xaxis=dict(showbackground=False),
             yaxis=dict(showbackground=False),
@@ -115,7 +149,6 @@ def index():
         ),
         showlegend=True
     )
-
 
     # Generate HTML div for the plot
     plot_div = pyo.plot(fig, include_plotlyjs=False, output_type='div')

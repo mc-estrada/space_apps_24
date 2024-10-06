@@ -1,10 +1,11 @@
-import csv
 import os
-import json
-import matlab.engine
+import csv
+import json #not sure if still needed
+#import matlab.engine //not needed anymore
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from space_data import load_files
 
 def create_base_plane():
     fig = plt.figure()
@@ -31,6 +32,7 @@ def plot_point(ax, points):
     x, y, z = zip(*points)
     ax.scatter(x, y, z, c='r', marker='o')
 
+"""
 def read_neo_pha_database(filename):
     neo_pha_data = []
 
@@ -69,6 +71,7 @@ def read_near_earth_comet_database(filename):
             near_earth_comet_data.append(data)
 
     return near_earth_comet_data
+"""
 
 def populate_plane(ax, neo_pha_data, near_earth_comet_data):
     neo_points = [
@@ -92,13 +95,14 @@ def populate_plane(ax, neo_pha_data, near_earth_comet_data):
     plot_point(ax, neo_points)
     plot_point(ax, comet_points)
 
+"""
 def load_data():
-    #read data from file 'Near Earth Comet Database.csv' into data structure
-    #read data from file 'NEO PHA Database.csv' into data structure
-
-
-    return
-
+    # Load the data from the files
+    neo_pha_data = read_neo_pha_database('NEO PHA Database.csv')
+    near_earth_comet_data = read_near_earth_comet_database('Near Earth Comet Database.csv')
+    
+    return neo_pha_data, near_earth_comet_data
+"""
 
 
 def update_plane():
@@ -113,19 +117,13 @@ def next_position(object):
 
 
 def main():
-
     ax = create_base_plane()
+
+    planets, neos, comets = load_files()
+
+    populate_plane(ax, planets, neos, comets)
     
-    populate_plane(ax, 'Near Earth Comet Database.csv')
-    populate_plane(ax, 'NEO PHA Database.csv')
-
-    populate_plane(ax, neo_pha_data, near_earth_comet_data)
-
-    update_plane()
-
     plt.show()
-    return
-
 
 if __name__ == "__main__":
     main()

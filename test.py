@@ -73,42 +73,41 @@ for _, row in planet_data.iterrows():
 
 # Add NEOs
 for index, row in neo_data.iterrows():
-    if row['pha'] == 'Y':  # Only plot hazardous NEOs
-        a = row['a'] * AU_to_km
-        e = row['e']
-        i = row['i']
-        ma = row['ma']
+    a = row['a'] * AU_to_km
+    e = row['e']
+    i = row['i']
+    ma = row['ma']
 
-        # Calculate radius and true anomaly
-        num_points = 100
-        true_anomalies = np.linspace(0, 360, num_points)
+    # Calculate radius and true anomaly
+    num_points = 100
+    true_anomalies = np.linspace(0, 360, num_points)
 
-        M = np.radians(ma)  # Mean anomaly in radians
-        E = M  # Start with E = M
-        for _ in range(10):  # Iterate to solve Kepler's equation
-            E = M + e * np.sin(E)
+    M = np.radians(ma)  # Mean anomaly in radians
+    E = M  # Start with E = M
+    for _ in range(10):  # Iterate to solve Kepler's equation
+        E = M + e * np.sin(E)
 
-        true_anomaly = 2 * np.arctan2(np.sqrt(1 + e) * np.sin(E / 2), np.sqrt(1 - e) * np.cos(E / 2))
-        r = a * (1 - e * np.cos(E))  # Radius at true anomaly
+    true_anomaly = 2 * np.arctan2(np.sqrt(1 + e) * np.sin(E / 2), np.sqrt(1 - e) * np.cos(E / 2))
+    r = a * (1 - e * np.cos(E))  # Radius at true anomaly
 
-        # Convert to Cartesian coordinates
-        x = r * np.cos(true_anomaly)
-        y = r * np.sin(true_anomaly)
+    # Convert to Cartesian coordinates
+    x = r * np.cos(true_anomaly)
+    y = r * np.sin(true_anomaly)
 
-        # Apply orbital inclination
-        z = r * np.sin(np.radians(i))  # Inclination for NEOs
+    # Apply orbital inclination
+    z = r * np.sin(np.radians(i))  # Inclination for NEOs
 
-        # Rotate the orbit for proper inclination
-        z_rotated = z * np.cos(np.radians(i)) - y * np.sin(np.radians(i))
-        y_rotated = y * np.cos(np.radians(i)) + z * np.sin(np.radians(i))
+    # Rotate the orbit for proper inclination
+    z_rotated = z * np.cos(np.radians(i)) - y * np.sin(np.radians(i))
+    y_rotated = y * np.cos(np.radians(i)) + z * np.sin(np.radians(i))
 
-        # Plot NEO as a point
-        fig.add_trace(go.Scatter3d(
-            x=[x], y=[y_rotated], z=[z_rotated],
-            mode='markers',
-            marker=dict(size=2, color='gray', opacity=0.7),
-            name=row['full_name']
-        ))
+    # Plot NEO as a point
+    fig.add_trace(go.Scatter3d(
+        x=[x], y=[y_rotated], z=[z_rotated],
+        mode='markers',
+        marker=dict(size=2, color='gray', opacity=0.7),
+        name=row['full_name']
+    ))
 
 # Add NECs (comets)
 for index, row in nec_data.iterrows():

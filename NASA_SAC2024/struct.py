@@ -1,3 +1,72 @@
+#Planets Database.csv
+#full_name,T (years),e,a (AU),i,L (mean long.),varpi (long.peri),Om (Long. Ascend node),om (arg peri),diameter (km),Orbital Vel. (km/s)
+
+#NEO PHA Database.csv
+#neo,pha,full_name,diameter,orbit_id,epoch,e,a,q,i,w,per_y,om,ma,ad,n,moid,H,class,Notes,
+
+#Near Earth Comet Database.csv
+#full_name,neo,pha,H,G,M1,M2,epoch,e,a,q,i,om,w,ma,ad,n,per_y,moid
+
+
+'''
+// Orbital Parameters common across datasets
+typedef struct
+{
+    double e;       // Eccentricity
+    double a;       // Semi-major axis in AU
+    double q;       // Perihelion distance in AU
+    double i;       // Inclination in degrees
+    double L;       // Mean longitude in degrees (planets only)
+    double varpi;   // Longitude of periapsis (planets)
+    double Om;      // Longitude of the ascending node
+    double w;       // Argument of periapsis
+    double ma;      // Mean anomaly
+    double ad;      // Aphelion distance in AU
+    double n;       // Mean motion (degrees/day)
+    double per_y;   // Orbital period in years
+    double moid;    // Minimum Orbit Intersection Distance (NEOs, comets)
+    double epoch;   // Epoch (reference time for orbital elements)
+} OrbitalParams;
+
+// Physical Parameters (like diameter, velocity)
+typedef struct
+{
+    double diameter;     // Diameter in km (for planets/NEOs)
+    double orbital_vel;  // Orbital velocity in km/s (for planets)
+} PhysicalParams;
+
+// Extra Parameters for comets (e.g., brightness)
+typedef struct
+{
+    double H;    // Absolute magnitude (comets, NEOs)
+    double G;    // Slope parameter (comets, NEOs)
+    double M1;   // Magnitude parameter 1 (comets)
+    double M2;   // Magnitude parameter 2 (comets)
+} CometParams;
+
+// Main structure for Planets, NEOs, PHAs, and Comets
+typedef struct
+{
+    char full_name[100];  // Object name
+    int neo;              // 1 if Near Earth Object, 0 otherwise
+    int pha;              // 1 if Potentially Hazardous Asteroid, 0 otherwise
+    char orbit_id[50];    // Orbit ID (for NEOs)
+    char classification[50]; // Classification (NEOs, comets)
+    char notes[200];      // Notes on the object
+
+    // Orbital parameters for the object
+    OrbitalParams orbit;
+
+    // Physical properties (diameter, velocity)
+    PhysicalParams physical;
+
+    // Specific parameters for comets (H, G, M1, M2)
+    CometParams comet_params;
+
+} SpaceObject;
+
+'''
+
 import csv
 from typing import List, Optional
 from dataclasses import dataclass
@@ -151,6 +220,8 @@ def read_near_earth_comet_database(filename: str) -> List[SpaceObject]:
             )
             space_objects.append(comet_object)
     return space_objects
+
+
 
 
 def load_files():

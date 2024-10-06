@@ -82,10 +82,32 @@ def main():
     ax = create_base_plane()
     #load data
     planets, neos, comets = load_files()
+
+    #print all data
+    print("Planets:")
+    for planet in planets:
+        print(f"Name: {planet.full_name}, Eccentricity: {planet.orbit.e}, "
+              f"Semi-major axis: {planet.orbit.a} AU, "
+              f"Diameter: {planet.physical.diameter} km")
+
+    print("\nNEOs:")
+    for neo in neos:
+        print(f"Name: {neo.full_name}, Eccentricity: {neo.orbit.e}, "
+              f"Semi-major axis: {neo.orbit.a} AU, "
+              f"Diameter: {neo.physical.diameter} km, "
+              f"NEO: {neo.neo}, PHA: {neo.pha}")
+
+    print("\nComets:")
+    for comet in comets:
+        print(f"Name: {comet.full_name}, Eccentricity: {comet.orbit.e}, "
+              f"Semi-major axis: {comet.orbit.a} AU, "
+              f"Diameter: {comet.physical.diameter} km, "
+              f"H: {comet.comet_params.H}")
+
+
     #set up initial position
     populate_plane(ax, planets, neos, comets)
     plt.show()
-
     #calculate orbits and position changes
     update_plane()
 

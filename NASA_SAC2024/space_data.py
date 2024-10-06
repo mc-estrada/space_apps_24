@@ -1,8 +1,17 @@
+#Planets Database.csv
+#full_name,T (years),e,a (AU),i,L (mean long.),varpi (long.peri),Om (Long. Ascend node),om (arg peri),diameter (km),Orbital Vel. (km/s)
+
+#NEO PHA Database.csv
+#neo,pha,full_name,diameter,orbit_id,epoch,e,a,q,i,w,per_y,om,ma,ad,n,moid,H,class,Notes,
+
+#Near Earth Comet Database.csv
+#full_name,neo,pha,H,G,M1,M2,epoch,e,a,q,i,om,w,ma,ad,n,per_y,moid
+
 import csv
 from typing import List, Optional
 from dataclasses import dataclass
 
-#common parameter
+# Common parameters
 @dataclass
 class OrbitalParams:
     e: Optional[float] = None  # Eccentricity
@@ -34,13 +43,16 @@ class CometParams:
 
 @dataclass
 class SpaceObject:
-    full_name: str  # Object name
-    neo: int = 0  # 1 if Near Earth Object, 0 otherwise
-    pha: int = 0  # 1 if Potentially Hazardous Asteroid, 0 otherwise
-    orbit_id: Optional[str] = None  # Orbit ID (for NEOs)
-    classification: Optional[str] = None  # Classification (NEOs, comets)
+    full_name: str
+    neo: int = 0
+    pha: int = 0
+    orbit_id: Optional[str] = None
+    classification: Optional[str] = None
     notes: Optional[str] = None  # Notes on the object
 
+    x: Optional[float] = None  # X coordinate
+    y: Optional[float] = None  # Y coordinate
+    z: Optional[float] = None  # Z coordinate
     orbit: OrbitalParams = OrbitalParams()
     physical: PhysicalParams = PhysicalParams()
     comet_params: CometParams = CometParams()
@@ -68,6 +80,12 @@ def read_planets_database(filename: str) -> List[SpaceObject]:
                     orbital_vel=float(row.get('Orbital Vel. (km/s)', 0))
                 )
             )
+
+            # Assuming x, y, z are available in the planets database
+            planet.x = float(row.get('x', 0)) if 'x' in row else None
+            planet.y = float(row.get('y', 0)) if 'y' in row else None
+            planet.z = float(row.get('z', 0)) if 'z' in row else None
+            
             space_objects.append(planet)
     return space_objects
 
@@ -108,6 +126,12 @@ def read_neo_pha_database(filename: str) -> List[SpaceObject]:
                     H=float(row.get('H', 0))
                 )
             )
+
+            # Assuming x, y, z are available in the NEO database
+            neo_object.x = float(row.get('x', 0)) if 'x' in row else None
+            neo_object.y = float(row.get('y', 0)) if 'y' in row else None
+            neo_object.z = float(row.get('z', 0)) if 'z' in row else None
+            
             space_objects.append(neo_object)
     return space_objects
 
@@ -129,28 +153,45 @@ def read_near_earth_comet_database(filename: str) -> List[SpaceObject]:
                 classification=row.get('class', '').strip(),
                 notes=row.get('Notes', '').strip(),
                 orbit=OrbitalParams(
-                    e=float(row.get('e', 0) or 0),
-                    a=float(row.get('a', 0) or 0),
-                    q=float(row.get('q', 0) or 0),
-                    i=float(row.get('i', 0) or 0),
-                    w=float(row.get('w', 0) or 0),
-                    Om=float(row.get('om', 0) or 0),
-                    ma=float(row.get('ma', 0) or 0),
-                    ad=float(row.get('ad', 0) or 0),
-                    n=float(row.get('n', 0) or 0),
-                    moid=float(row.get('moid', 0) or 0),
-                    per_y=float(row.get('per_y', 0) or 0),
-                    epoch=float(row.get('epoch', 0) or 0)
+                    e=safe_float(row.get('e', '')),
+                    a=safe_float(row.get('a', '')),
+                    q=safe_float(row.get('q', '')),
+                    i=safe_float(row.get('i', '')),
+                    w=safe_float(row.get('w', '')),
+                    Om=safe_float(row.get('om', '')),
+                    ma=safe_float(row.get('ma', '')),
+                    ad=safe_float(row.get('ad', '')),
+                    n=safe_float(row.get('n', '')),
+                    moid=safe_float(row.get('moid', '')),
+                    per_y=safe_float(row.get('per_y', '')),
+                    epoch=safe_float(row.get('epoch', ''))
                 ),
                 physical=PhysicalParams(
-                    diameter=float(row.get('diameter', 0) or 0)
+                    diameter=safe_float(row.get('diameter', ''))
                 ),
                 comet_params=CometParams(
-                    H=float(row.get('H', 0) or 0)
+                    H=safe_float(row.get('H', '')),
+                    G=safe_float(row.get('G', '')),
+                    M1=safe_float(row.get('M1', '')),
+                    M2=safe_float(row.get('M2', ''))
                 )
             )
+
+            # Assuming x, y, z are available in the comet database
+            comet_object.x = safe_float(row.get('x', ''))
+            comet_object.y = safe_float(row.get('y', ''))
+            comet_object.z = safe_float(row.get('z', ''))
+
             space_objects.append(comet_object)
     return space_objects
+
+
+    """Convert a string to a float, return None if the string is empty or not a valid float."""
+def safe_float(value: str) -> Optional[float]:
+    try:
+        return float(value) if value.strip() else None
+    except ValueError:
+        return None
 
 
 def load_files():

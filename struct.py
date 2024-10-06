@@ -68,10 +68,8 @@ typedef struct
 '''
 
 import csv
-from typing import List
-
+from typing import List, Optional
 from dataclasses import dataclass
-from typing import Optional
 
 #common parameter
 @dataclass
@@ -117,8 +115,6 @@ class SpaceObject:
     comet_params: CometParams = CometParams()
 
 
-
-
 def read_planets_database(filename: str) -> List[SpaceObject]:
     space_objects = []
     with open(filename, mode='r') as file:
@@ -149,10 +145,14 @@ def read_neo_pha_database(filename: str) -> List[SpaceObject]:
     with open(filename, mode='r') as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
-            neo = SpaceObject(
+            # Check and convert 'neo' and 'pha' values to integers
+            neo = int(row.get('neo', 0)) if row.get('neo', '0') in ['1', '0'] else 0
+            pha = int(row.get('pha', 0)) if row.get('pha', '0') in ['1', '0'] else 0
+            
+            neo_object = SpaceObject(
                 full_name=row.get('full_name', '').strip(),
-                neo=int(row.get('neo', 0)),
-                pha=int(row.get('pha', 0)),
+                neo=neo,
+                pha=pha,
                 orbit_id=row.get('orbit_id', '').strip(),
                 classification=row.get('class', '').strip(),
                 notes=row.get('Notes', '').strip(),
@@ -177,46 +177,59 @@ def read_neo_pha_database(filename: str) -> List[SpaceObject]:
                     H=float(row.get('H', 0))
                 )
             )
-            space_objects.append(neo)
+            space_objects.append(neo_object)
     return space_objects
+
 
 def read_near_earth_comet_database(filename: str) -> List[SpaceObject]:
     space_objects = []
     with open(filename, mode='r') as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
-            comet = SpaceObject(
+            # Check and convert 'neo' and 'pha' values to integers
+            neo = int(row.get('neo', 0)) if row.get('neo', '0') in ['1', '0'] else 0
+            pha = int(row.get('pha', 0)) if row.get('pha', '0') in ['1', '0'] else 0
+            
+            comet_object = SpaceObject(
                 full_name=row.get('full_name', '').strip(),
-                neo=int(row.get('neo', 0)),
-                pha=int(row.get('pha', 0)),
+                neo=neo,
+                pha=pha,
+                orbit_id=row.get('orbit_id', '').strip(),
                 classification=row.get('class', '').strip(),
+                notes=row.get('Notes', '').strip(),
                 orbit=OrbitalParams(
-                    e=float(row.get('e', 0)),
-                    a=float(row.get('a', 0)),
-                    q=float(row.get('q', 0)),
-                    i=float(row.get('i', 0)),
-                    Om=float(row.get('om', 0)),
-                    w=float(row.get('w', 0)),
-                    ma=float(row.get('ma', 0)),
-                    ad=float(row.get('ad', 0)),
-                    n=float(row.get('n', 0)),
-                    moid=float(row.get('moid', 0)),
-                    per_y=float(row.get('per_y', 0)),
-                    epoch=float(row.get('epoch', 0))
+                    e=float(row.get('e', 0) or 0),
+                    a=float(row.get('a', 0) or 0),
+                    q=float(row.get('q', 0) or 0),
+                    i=float(row.get('i', 0) or 0),
+                    w=float(row.get('w', 0) or 0),
+                    Om=float(row.get('om', 0) or 0),
+                    ma=float(row.get('ma', 0) or 0),
+                    ad=float(row.get('ad', 0) or 0),
+                    n=float(row.get('n', 0) or 0),
+                    moid=float(row.get('moid', 0) or 0),
+                    per_y=float(row.get('per_y', 0) or 0),
+                    epoch=float(row.get('epoch', 0) or 0)
+                ),
+                physical=PhysicalParams(
+                    diameter=float(row.get('diameter', 0) or 0)
                 ),
                 comet_params=CometParams(
-                    H=float(row.get('H', 0)),
-                    G=float(row.get('G', 0)),
-                    M1=float(row.get('M1', 0)),
-                    M2=float(row.get('M2', 0))
+                    H=float(row.get('H', 0) or 0)
                 )
             )
-            space_objects.append(comet)
+            space_objects.append(comet_object)
     return space_objects
 
 
-def load_fieles():
+
+
+def load_files():
     planets = read_planets_database('Planets Database.csv')
     neos = read_neo_pha_database('NEO PHA Database.csv')
     comets = read_near_earth_comet_database('Near Earth Comet Database.csv')
-    return
+    print("Loading files into RAM successful")
+    return planets, neos, comets
+
+if __name__ == "__main__":
+    load_files()

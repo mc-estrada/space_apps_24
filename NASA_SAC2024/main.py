@@ -1,6 +1,6 @@
 import os
 import csv
-import json #not sure if still needed
+#import json #not sure if still needed
 #import matlab.engine //not needed anymore
 import numpy as np
 import matplotlib.pyplot as plt
@@ -73,27 +73,38 @@ def read_near_earth_comet_database(filename):
     return near_earth_comet_data
 """
 
-def populate_plane(ax, neo_pha_data, near_earth_comet_data):
-    neo_points = [
-        (
-            data['a'] * np.cos(np.radians(data['i'])),  # x
-            data['a'] * np.sin(np.radians(data['i'])),  # y
-            data['q']                                    # z
-        )
-        for data in neo_pha_data if data['a'] is not None and data['i'] is not None and data['q'] is not None
-    ]
+def populate_plane(ax, planets, neos, comets):
+    # planets, blue
+    for planet in planets:
+        x = planet.orbit.a * np.cos(np.radians(planet.orbit.L)) if planet.orbit.L is not None else 0
+        y = planet.orbit.a * np.sin(np.radians(planet.orbit.L)) if planet.orbit.L is not None else 0
+        z = 0
+    ax.scatter(x, y, z, c='b', marker='o', label=planet.full_name)
 
-    comet_points = [
-        (
-            data['a'] * np.cos(np.radians(data['i'])),  # x
-            data['a'] * np.sin(np.radians(data['i'])),  # y
-            data['q']                                    # z
-        )
-        for data in near_earth_comet_data if data['a'] is not None and data['i'] is not None and data['q'] is not None
-    ]
+    # NEOs, red
+    for neo in neos:
+        if neo.orbit.L is not None:  # Check if L is not None
+            x = neo.orbit.a * np.cos(np.radians(neo.orbit.L))
+            y = neo.orbit.a * np.sin(np.radians(neo.orbit.L))
+        else:
+            x, y = 0, 0
+        z = 0
+    ax.scatter(x, y, z, c='r', marker='^', label=neo.full_name)
 
-    plot_point(ax, neo_points)
-    plot_point(ax, comet_points)
+    # comets, greem
+    for comet in comets:
+        if comet.orbit.L is not None:  # Check if L is not None
+            x = comet.orbit.a * np.cos(np.radians(comet.orbit.L))
+            y = comet.orbit.a * np.sin(np.radians(comet.orbit.L))
+        else:
+            x, y = 0, 0
+        z = 0
+        
+        ax.scatter(x, y, z, c='g', marker='s', label=comet.full_name)
+
+    return
+
+
 
 """
 def load_data():
@@ -117,13 +128,16 @@ def next_position(object):
 
 
 def main():
-    ax = create_base_plane()
-
-    planets, neos, comets = load_files()
-
-    populate_plane(ax, planets, neos, comets)
     
+    #set up space
+    ax = create_base_plane()
+    #load data
+    planets, neos, comets = load_files()
+    #set up initial position
+    populate_plane(ax, planets, neos, comets)
     plt.show()
+
+
 
 if __name__ == "__main__":
     main()

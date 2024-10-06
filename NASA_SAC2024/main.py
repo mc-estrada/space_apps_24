@@ -93,11 +93,11 @@ def populate_plane(ax, neo_pha_data, near_earth_comet_data):
     plot_point(ax, comet_points)
 
 def load_data():
-    #read data from file 'Near Earth Comet Database.csv' into data structure
-    #read data from file 'NEO PHA Database.csv' into data structure
-
-
-    return
+    # Load the data from the files
+    neo_pha_data = read_neo_pha_database('NEO PHA Database.csv')
+    near_earth_comet_data = read_near_earth_comet_database('Near Earth Comet Database.csv')
+    
+    return neo_pha_data, near_earth_comet_data
 
 
 
@@ -113,19 +113,22 @@ def next_position(object):
 
 
 def main():
-
+    # Create base 3D plane
     ax = create_base_plane()
     
-    populate_plane(ax, 'Near Earth Comet Database.csv')
-    populate_plane(ax, 'NEO PHA Database.csv')
-
+    # Load the data from the CSV files
+    neo_pha_data, near_earth_comet_data = load_data()
+    
+    # Populate the plane with data from both databases
     populate_plane(ax, neo_pha_data, near_earth_comet_data)
 
+    # Update the plane (this is a placeholder)
     update_plane()
 
+    # Display the plot
     plt.show()
-    return
 
+    return
 
 if __name__ == "__main__":
     main()

@@ -33,6 +33,35 @@ def plot_point(ax, points):
     ax.scatter(x, y, z, c='r', marker='o')
 
 
+def calculate_position(a, e, i, om, w, ma):
+    # Convert degrees to radians
+    i = np.radians(i)
+    om = np.radians(om)
+    w = np.radians(w)
+    ma = np.radians(ma)
+
+    # Calculate the eccentric anomaly (E) using Kepler's equation
+    E = ma + (e * np.sin(ma))  # First approximation
+
+    # Iterate to find a more accurate E
+    for _ in range(10):  # 10 iterations for convergence
+        E = ma + e * np.sin(E)
+
+    # Calculate the true anomaly (ν)
+    ν = 2 * np.arctan2(np.sqrt(1 + e) * np.sin(E / 2), np.sqrt(1 - e) * np.cos(E / 2))
+
+    # Distance from the Sun
+    r = a * (1 - e * np.cos(E))
+
+    # Heliocentric coordinates
+    x = r * (np.cos(om) * np.cos(w + ν) - np.sin(om) * np.sin(w + ν) * np.cos(i))
+    y = r * (np.sin(om) * np.cos(w + ν) + np.cos(om) * np.sin(w + ν) * np.cos(i))
+    z = r * (np.sin(w + ν) * np.sin(i))
+
+    return x, y, z
+
+
+
 def populate_plane(ax, planets, neos, comets):
     # planets, blue
     for planet in planets:
